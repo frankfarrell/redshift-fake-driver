@@ -21,7 +21,13 @@ class UnloadCommandParserTest extends FlatSpec {
       ),
       createManifest = false,
       delimiter = '|',
-      addQuotes = false
+      addQuotes = false ,
+      nullString= "",
+      escape= false ,
+      bzip= false ,
+      gzip= false ,
+      allowOverwrite= false ,
+      parallel= false
     )
 
     assert(UnloadCommandParser.parse(command) == Some(expected))
@@ -58,6 +64,29 @@ class UnloadCommandParserTest extends FlatSpec {
          |""".stripMargin
 
     assert(UnloadCommandParser.parse(command).exists(_.addQuotes))
+  }
+
+  it should "parse gzip" in {
+    val command =
+      s"""
+         |UNLOAD ('select * from foo_bar where baz = \'2016-01-01\'') TO '${Global.s3Scheme}some-bucket/path/to/data'
+         |CREDENTIALS 'aws_access_key_id=AKIAXXXXXXXXXXXXXXX;aws_secret_access_key=YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
+         |GZIP;
+         |""".stripMargin
+
+    assert(UnloadCommandParser.parse(command).exists(_.gzip))
+  }
+
+  it should "parse null string" in {
+    val command =
+      s"""
+         |UNLOAD ('select * from foo_bar where baz = \'2016-01-01\'') TO '${Global.s3Scheme}some-bucket/path/to/data'
+         |CREDENTIALS 'aws_access_key_id=AKIAXXXXXXXXXXXXXXX;aws_secret_access_key=YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
+         |GZIP
+         |NULL AS 'test';
+         |""".stripMargin
+
+    assert(UnloadCommandParser.parse(command).map(_.nullString) == Some("test"))
   }
 
   it should "parse multiple options" in {

@@ -40,6 +40,16 @@ object UnloadCommandParser extends BaseParser with QueryCompatibility {
 
   val manifestParser = s"$any*(?i)MANIFEST$any*".r
 
+  val escapeParser = s"$any*(?i)ESCAPE$any*".r
+
+  val bzip2Parser = s"$any*(?i)BZIP2$any*".r
+
+  val gzipParser = s"$any*(?i)GZIP$any*".r
+
+  val allowOverwriteParser = s"$any*(?i)ALLOWOVERWRITE$any*".r
+
+  val parallelParser = s"$any*(?i)PARALLEL$any*".r
+
   val statementParser = "(?i)UNLOAD".r ~> selectStatementParser ^^ { s =>
     val unescaped = s.replace("""\'""", "'")
     unescaped
@@ -57,7 +67,14 @@ object UnloadCommandParser extends BaseParser with QueryCompatibility {
           auth,
           parse(manifestParser, unloadOptions).successful,
           parse(delimiterParser, unloadOptions).getOrElse('|'),
-          parse(addQuotesParser, unloadOptions).successful
+          parse(addQuotesParser, unloadOptions).successful,
+          //TODO If FIXEDWIDTH is supported in future, set this correctly
+          parse(nullAsParser, unloadOptions).getOrElse(""),
+          parse(escapeParser, unloadOptions).successful,
+          parse(bzip2Parser, unloadOptions).successful,
+          parse(gzipParser, unloadOptions).successful,
+          parse(allowOverwriteParser, unloadOptions).successful,
+          parse(parallelParser, unloadOptions).successful
         )
       },
       query

@@ -1,5 +1,6 @@
 package jp.ne.opt.redshiftfake.parse
 
+import jp.ne.opt.redshiftfake.parse.CopyCommandParser.{any, space}
 import jp.ne.opt.redshiftfake.{Credentials, Global}
 import jp.ne.opt.redshiftfake.s3.S3Location
 
@@ -29,6 +30,9 @@ trait BaseParser extends RegexParsers {
   }
 
   val delimiterParser = s"$any*(?i)DELIMITER".r ~> "(?i)AS".r.? ~> "'" ~> """[|,]""".r <~ "'" <~ s"$any*".r ^^ { s => s.head }
+
+  val nullAsParser = s"$any*(?i)NULL$space+AS".r ~> "'" ~> """[^']*""".r <~ "'" <~ s"$any*".r
+
 }
 
 object BaseParser extends BaseParser

@@ -11,5 +11,11 @@ case class UnloadCommand(
   credentials: Credentials,
   createManifest: Boolean,
   delimiter: Char,
-  addQuotes: Boolean
+  addQuotes: Boolean,
+  nullString: String,
+  escape: Boolean,
+  bzip: Boolean,
+  gzip: Boolean,
+  allowOverwrite: Boolean,
+  parallel: Boolean
 )
